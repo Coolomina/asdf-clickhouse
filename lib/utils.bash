@@ -42,8 +42,8 @@ download_release() {
 	filename="$2"
 
 	# TODO: Adapt the release URL convention for clickhouse
-	url="$GH_REPO/archive/v${version}.tar.gz"
-
+	# url="$GH_REPO/archive/v${version}.tar.gz"
+	url="$GH_REPO/releases/download/v23.10.5.20-stable/clickhouse-common-static-23.10.5.20-amd64.tgz"
 	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
 }
@@ -51,7 +51,7 @@ download_release() {
 install_version() {
 	local install_type="$1"
 	local version="$2"
-	local install_path="${3%/bin}/bin"
+	local install_path="${3%/bin}"
 
 	if [ "$install_type" != "version" ]; then
 		fail "asdf-$TOOL_NAME supports release installs only"
@@ -63,8 +63,11 @@ install_version() {
 
 		# TODO: Assert clickhouse executable exists.
 		local tool_cmd
+		echo "INSTALL_PATH = $install_path"
 		tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
-		test -x "$install_path/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."
+		echo "TOOL_CMD = $tool_cmd"
+		ls -la $install_path
+		test -x "$install_path/usr/bin/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."
 
 		echo "$TOOL_NAME $version installation was successful!"
 	) || (
